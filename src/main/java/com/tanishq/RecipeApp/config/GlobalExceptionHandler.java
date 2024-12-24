@@ -33,7 +33,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidMethodArgument(HandlerMethodValidationException ex) {
         StringBuilder errorMessage = new StringBuilder();
 
-        // Iterate through validation errors from the exception
         ex.getParameterValidationResults().forEach((parameterValidationResult) -> {
             parameterValidationResult.getResolvableErrors().forEach(messageSourceResolvable -> {
                 errorMessage

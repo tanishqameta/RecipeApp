@@ -1,9 +1,7 @@
 package com.tanishq.RecipeApp.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +21,7 @@ public class RecipeSummary {
     private String image;
     private Double rating;
     private Integer reviewCount;
+    private String cuisine;
 
     public RecipeSummary(@NotNull Recipe recipe) {
         this.id = recipe.getId();
@@ -33,5 +32,6 @@ public class RecipeSummary {
         this.image = recipe.getImage();
         this.rating = recipe.getRating();
         this.reviewCount = recipe.getReviewCount();
+        this.cuisine = recipe.getCuisine();
     }
 }
