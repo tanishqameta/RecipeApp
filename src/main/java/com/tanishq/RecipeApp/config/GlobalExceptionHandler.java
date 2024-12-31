@@ -9,18 +9,18 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import reactor.core.publisher.Mono;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RecipeNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(RecipeNotFoundException ex) {
-        return new ResponseEntity<ErrorResponse>(new ErrorResponse(ErrorCode.RECIPE_NOT_FOUND, ex.getMessage()), HttpStatus.NOT_FOUND);
+    public Mono<ResponseEntity<ErrorResponse>> handleNotFound(RecipeNotFoundException ex) {
+        return Mono.just(new ResponseEntity<ErrorResponse>(new ErrorResponse(ErrorCode.RECIPE_NOT_FOUND, ex.getMessage()), HttpStatus.NOT_FOUND));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        // Collect validation errors
+    public Mono<ResponseEntity<ErrorResponse>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         StringBuilder errorMessage = new StringBuilder();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             errorMessage.append(error.getDefaultMessage()).append("; ");
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidMethodArgument(HandlerMethodValidationException ex) {
+    public Mono<ResponseEntity<ErrorResponse>> handleInvalidMethodArgument(HandlerMethodValidationException ex) {
         StringBuilder errorMessage = new StringBuilder();
 
         ex.getParameterValidationResults().forEach((parameterValidationResult) -> {
@@ -46,13 +46,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+    public Mono<ResponseEntity<ErrorResponse>> handleGenericException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, ex.getMessage());
-        System.out.println(ex.getClass());
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return Mono.just(new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
-    private ResponseEntity<ErrorResponse> handleInvalidArgumentExceptionWithMessage(String message) {
-        return new ResponseEntity<ErrorResponse>(new ErrorResponse(ErrorCode.INVALID_ARGUMENT, message), HttpStatus.BAD_REQUEST);
+    private Mono<ResponseEntity<ErrorResponse>> handleInvalidArgumentExceptionWithMessage(String message) {
+        return Mono.just(new ResponseEntity<ErrorResponse>(new ErrorResponse(ErrorCode.INVALID_ARGUMENT, message), HttpStatus.BAD_REQUEST));
     }
 }

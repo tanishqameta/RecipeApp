@@ -6,8 +6,8 @@ import com.tanishq.RecipeApp.model.RecipeSummary;
 import com.tanishq.RecipeApp.repo.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class RecipeService {
@@ -15,11 +15,12 @@ public class RecipeService {
     @Autowired
     private RecipeRepository recipeRepository;
 
-    public List<RecipeSummary> searchRecipes(String query) {
-        return recipeRepository.searchRecipes(query);
+    public Flux<RecipeSummary> searchRecipes(String query) {
+        return recipeRepository.findByNameContainingIgnoreCaseOrCuisineContainingIgnoreCase(query, query);
     }
 
-    public Recipe getRecipeById(Long id) {
-        return recipeRepository.findById(id).orElseThrow(() -> new RecipeNotFoundException("Recipe with ID: "+id+" could not be found"));
+    public Mono<Recipe> getRecipeById(Long id) {
+        return recipeRepository.findById(id).
+                switchIfEmpty(Mono.error(new RecipeNotFoundException("Recipe with ID: "+id+" could not be found")));
     }
 }
